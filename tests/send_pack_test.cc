@@ -7,7 +7,7 @@
 
 //测试打包与发包
 
-int main()
+int main0()
 {
 	char buff[128] = {};
 
@@ -37,7 +37,8 @@ int main()
 	//fill ext
 	void* ext_body = malloc(4);
 	memset(ext_body, 0x0, 4);
-	rtp_add_ext_hdr(rtp_packet, 10, 1, ext_body);
+	//rtp_add_ext_hdr(rtp_packet, 10, 1, ext_body);
+	rtp_alloc_ext_hdr(rtp_packet, 10, 5);
 	//send
 	int sockfd = sockets::Socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	for (int i = 0; i < 10; ++i)

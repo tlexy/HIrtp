@@ -29,6 +29,19 @@ void rtp_add_ext_hdr(rtp_packet_t* rtp, uint16_t profile, uint16_t len, void* ex
 	rtp->hdr_ext.length = htons(rtp->hdr_ext.length);
 }
 
+void* rtp_alloc_ext_hdr(rtp_packet_t* rtp, uint16_t profile, uint16_t len)
+{
+	rtp->hdr.extbit = 1;
+	rtp->hdr_ext.profile_specific = profile;
+	rtp->hdr_ext.length = len;
+	rtp->ext_body = malloc(4*len);
+	rtp->ext_len = len;
+	rtp->hdr_ext.profile_specific = htons(rtp->hdr_ext.profile_specific);
+	rtp->hdr_ext.length = htons(rtp->hdr_ext.length);
+	memset(rtp->ext_body, 0x0, 4 * len);
+	return rtp->ext_body;
+}
+
 void rtp_pack(rtp_packet_t* rtp, rtp_parameter_t* param, rtp_session_t* session, const void* payload, int payload_len)
 {
 	rtp->hdr.cc = param->cc;
@@ -88,35 +101,65 @@ int rtp_copy(rtp_packet_t* rtp, void* dest, int dest_len)
 	return 0;
 }
 
-//int rtp_unpack_test(void* src, int len)
-//{
-//	if (len > sizeof(rtp_header_t))
-//	{
-//		return len;
-//	}
-//	return 0;
-//}
-//
-//rtp_packet_t* rtp_unpack(void* src, int len)
-//{
-//	if (len <= sizeof(rtp_header_t))
-//	{
-//		return NULL;
-//	}
-//	rtp_packet_t* rtp = (rtp_packet_t*)malloc(len + RTP_DATA_OFF);
-//	if (!rtp)
-//	{
-//		return NULL;
-//	}
-//	memcpy(&rtp->hdr, src, len);
-//	rtp->ptr = &rtp->hdr;
-//	rtp->ptr_len = len - sizeof(rtp_header_t);
-//	rtp->hdr.seq_number = ntohs(rtp->hdr.seq_number);
-//	rtp->hdr.timestamp = ntohl(rtp->hdr.timestamp);
-//	rtp->hdr.ssrc = ntohl(rtp->hdr.ssrc);
-//	return rtp;
-//}
-//
+int rtp_unpack_test(void* src, int len)
+{
+	if (len > sizeof(rtp_hdr_t))
+	{
+		return len;
+	}
+	return 0;
+}
+
+rtp_packet_t* rtp_unpack(void* src, int len)
+{
+	if (len <= sizeof(rtp_hdr_t))
+	{
+		return NULL;
+	}
+	rtp_packet_t* tmp = (rtp_packet_t*)src;
+	//头部长度，包含hdr及hdr_ext及hdr_body length
+	int header_len = sizeof(rtp_hdr_t);
+	if (tmp->hdr.extbit == 1)
+	{
+		header_len += sizeof(rtp_hdr_ext_t);
+		tmp->hdr_ext.length = ntohs(tmp->hdr_ext.length);
+		tmp->hdr_ext.profile_specific = ntohs(tmp->hdr_ext.profile_specific);
+		header_len = header_len + tmp->hdr_ext.length;
+	}
+	int payload_len = len - header_len;
+
+	char* p = (char*)src;
+	rtp_packet_t* rtp = (rtp_packet_t*)malloc(payload_len + sizeof(rtp_packet_t));
+	if (!rtp)
+	{
+		return NULL;
+	}
+	memset(rtp, 0x0, payload_len + sizeof(rtp_packet_t));
+	rtp->payload_len = payload_len;
+	int pos = sizeof(rtp_hdr_t);
+	if (rtp->hdr.extbit == 1)
+	{
+		memcpy(&rtp->hdr, src, sizeof(rtp_hdr_ext_t) + sizeof(rtp_hdr_t));
+		pos = sizeof(rtp_hdr_ext_t) + sizeof(rtp_hdr_t);
+	}
+	else
+	{
+		memcpy(&rtp->hdr, src, sizeof(rtp_hdr_t));
+	}
+	if (rtp->hdr_ext.length > 0)
+	{
+		rtp->ext_body = p + pos;
+		rtp->ext_len = rtp->hdr_ext.length;
+		pos += (rtp->ext_len * 4);
+	}
+	memcpy(rtp->arr, p + pos, payload_len);
+
+	rtp->hdr.seq_number = ntohs(rtp->hdr.seq_number);
+	rtp->hdr.timestamp = ntohl(rtp->hdr.timestamp);
+	rtp->hdr.ssrc = ntohl(rtp->hdr.ssrc);
+	return rtp;
+}
+
 void dump(rtp_packet_t* rtp, const char* text)
 {
 	printf("%s seq: %u, ssrc: %u, ts: %u, pt: %u, payload_len: %d\n", text,
