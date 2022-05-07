@@ -124,9 +124,13 @@ rtp_packet_t* rtp_unpack(void* src, int len)
 		header_len += sizeof(rtp_hdr_ext_t);
 		tmp->hdr_ext.length = ntohs(tmp->hdr_ext.length);
 		tmp->hdr_ext.profile_specific = ntohs(tmp->hdr_ext.profile_specific);
-		header_len = header_len + tmp->hdr_ext.length;
+		header_len = header_len + tmp->hdr_ext.length*4;
 	}
 	int payload_len = len - header_len;
+	if (payload_len < 1)
+	{
+		return NULL;
+	}
 
 	char* p = (char*)src;
 	rtp_packet_t* rtp = (rtp_packet_t*)malloc(payload_len + sizeof(rtp_packet_t));
@@ -162,6 +166,10 @@ rtp_packet_t* rtp_unpack(void* src, int len)
 
 void dump(rtp_packet_t* rtp, const char* text)
 {
+	if (!rtp)
+	{
+		return;
+	}
 	printf("%s seq: %u, ssrc: %u, ts: %u, pt: %u, payload_len: %d\n", text,
 		rtp->hdr.seq_number,
 		rtp->hdr.ssrc,
