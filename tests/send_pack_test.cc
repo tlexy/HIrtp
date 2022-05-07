@@ -36,7 +36,7 @@ int main()
 	for (int i = 0; i < 10; ++i)
 	{
 		dump(rtp_packet, "Send: ");
-		sockets::SendUdp(sockfd, (const char*)RTP_BYTE(rtp_packet), RTP_LEN(rtp_packet), 0, "81.71.41.235", 9900);
+		sockets::SendUdp(sockfd, (const char*)RTP_BYTE(rtp_packet), RTP_LEN(rtp_packet), 0, "123.60.90.46", 9900);
 		sess.seq_number += 1;
 		sess.timestamp += 1024;
 		//repack

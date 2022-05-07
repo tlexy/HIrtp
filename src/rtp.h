@@ -52,6 +52,11 @@ typedef struct rtp_packet
 	uint8_t arr[0];
 }rtp_packet_t;
 
+typedef struct {
+	uint16_t profile_specific; /* profile-specific info               */
+	uint16_t length;           /* number of 32-bit words in extension */
+} rtp_hdr_ext_t;
+
 #define RTP_DATA_OFF (sizeof(void*) + sizeof(uint32_t))//???
 
 #define RTP_BYTE(rtpp) &rtpp->hdr
