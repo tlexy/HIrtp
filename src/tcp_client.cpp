@@ -220,7 +220,7 @@ namespace sockets
 
 	int SendUdp(int sockfd, const char* buf, int len, int flags, const char* ip_str, int port)
 	{
-		if (!isIp(ip_str))
+		if (!isIp2(ip_str))
 		{
 			return -10086;
 		}
@@ -228,6 +228,44 @@ namespace sockets
 		addr_in.sin_family = AF_INET;
 		ParseIp(&addr_in, ip_str, port);
 		return sendto(sockfd, buf, len, flags, (const sockaddr*)&addr_in, sizeof(sockaddr_in));
+	}
+
+	void split(const std::string& text, const std::string& splitter, std::vector<std::string>& vecs)
+	{
+		size_t offset = 0;
+		size_t pos = text.find(splitter);
+		while (pos != std::string::npos)
+		{
+			if (pos - offset > 0)
+			{
+				vecs.push_back(text.substr(offset, pos - offset));
+			}
+			offset = pos + splitter.size();
+			pos = text.find(splitter, offset);
+		}
+		if (offset < text.size())
+		{
+			vecs.push_back(text.substr(offset));
+		}
+	}
+
+	bool isIp2(const std::string& str)
+	{
+		std::vector<std::string> vecs;
+		split(str, ".", vecs);
+		if (vecs.size() != 4)
+		{
+			return false;
+		}
+		for (int i = 0; i < vecs.size(); ++i)
+		{
+			int num = std::atoi(vecs[i].c_str());
+			if (num < 0 || num > 255)
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 
 	bool isIp(const std::string& str)

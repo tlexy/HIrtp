@@ -32,14 +32,14 @@ int main1()
 		buff[i] = i % 127;
 	}
 	//new rtp_packet
-	rtp_packet_t* rtp_packet = alloc_rtp(sizeof(buff));
-	//fill rtp_packet
-	pack_rtp(rtp_packet, &param, &sess, buff, sizeof(buff));
-	//
-	//dump(rtp_packet, "original packet: ");
+	//rtp_packet_t* rtp_packet = alloc_rtp(sizeof(buff));
+	////fill rtp_packet
+	//pack_rtp(rtp_packet, &param, &sess, buff, sizeof(buff));
+	////
+	////dump(rtp_packet, "original packet: ");
 
-	rtp_packet_t* un_rtp = rtp_unpack(RTP_BYTE(rtp_packet), RTP_LEN(rtp_packet));//sizeof(buff) + sizeof(rtp_header_t)
-	dump(un_rtp, "receive packet: ");
+	//rtp_packet_t* un_rtp = rtp_unpack(RTP_BYTE(rtp_packet), RTP_LEN(rtp_packet));//sizeof(buff) + sizeof(rtp_header_t)
+	//dump(un_rtp, "receive packet: ");
 
 	sockets::Destroy();
 
