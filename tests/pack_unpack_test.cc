@@ -13,7 +13,7 @@ void unpacket_rtp_packet(void*, int len)
 
 }
 
-int main()
+int main_unpack_test()
 {
 	sockets::Init();
 	

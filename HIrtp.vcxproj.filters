@@ -22,6 +22,9 @@
     <ClCompile Include="tests\send_pack_test.cc">
       <Filter>tests</Filter>
     </ClCompile>
+    <ClCompile Include="tests\recv_pack_test.cc">
+      <Filter>tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\rtp.h">

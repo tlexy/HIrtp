@@ -142,6 +142,7 @@
     <ClCompile Include="src\rtp.cpp" />
     <ClCompile Include="src\tcp_client.cpp" />
     <ClCompile Include="tests\pack_unpack_test.cc" />
+    <ClCompile Include="tests\recv_pack_test.cc" />
     <ClCompile Include="tests\send_pack_test.cc" />
   </ItemGroup>
   <ItemGroup>
