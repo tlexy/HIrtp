@@ -29,9 +29,11 @@ namespace sockets
 	int SendUdp(int sockfd, const char* buf, int len, int flags, const sockaddr_in* addr);
 	int SendUdp(int sockfd, const char* buf, int len, int flags, const char* ip_str, int port);
 
+	void split(const std::string& text, const std::string& splitter, std::vector<std::string>& vecs);
 
 	void getIpByDoname(const std::string&, std::vector<std::string>&);
 	bool isIp(const std::string& str);
+	bool isIp2(const std::string& str);
 	bool isNum(const std::string& str);
 
 	uint64_t hostToNetwork64(uint64_t host64);

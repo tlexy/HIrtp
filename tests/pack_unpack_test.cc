@@ -6,14 +6,14 @@
 
 //测试打包与发包
 
-static char buff[1024] = {};
+static char buff[128] = {};
 
 void unpacket_rtp_packet(void*, int len)
 {
 
 }
 
-int main1()
+int main_unpack_test()
 {
 	sockets::Init();
 	
@@ -32,13 +32,18 @@ int main1()
 		buff[i] = i % 127;
 	}
 	//new rtp_packet
-	rtp_packet_t* rtp_packet = alloc_rtp(sizeof(buff));
+	rtp_packet_t* rtp_packet = rtp_alloc(sizeof(buff));
 	//fill rtp_packet
-	pack_rtp(rtp_packet, &param, &sess, buff, sizeof(buff));
+	rtp_pack(rtp_packet, &param, &sess, buff, sizeof(buff));
+	rtp_alloc_ext_hdr(rtp_packet, 10, 3);
 	//
-	//dump(rtp_packet, "original packet: ");
+	dump(rtp_packet, "original packet: ");
 
-	rtp_packet_t* un_rtp = rtp_unpack(RTP_BYTE(rtp_packet), RTP_LEN(rtp_packet));//sizeof(buff) + sizeof(rtp_header_t)
+	int pack_len = rtp_len(rtp_packet);
+	void* pbuf = malloc(pack_len);
+	rtp_copy(rtp_packet, pbuf, pack_len);
+
+	rtp_packet_t* un_rtp = rtp_unpack(pbuf, pack_len);//sizeof(buff) + sizeof(rtp_header_t)
 	dump(un_rtp, "receive packet: ");
 
 	sockets::Destroy();

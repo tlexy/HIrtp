@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 
-
 typedef struct rtp_header
 {
 #ifdef HIRTP_BIGENDIAN
@@ -25,7 +24,7 @@ typedef struct rtp_header
 	uint32_t timestamp;
 	uint32_t ssrc;
 	//uint32_t csrc[16];//maybe never use
-} rtp_header_t;
+} rtp_hdr_t;
 
 typedef struct rtp_parameter
 {
@@ -44,32 +43,36 @@ typedef struct rtp_session
 	uint32_t ssrc;
 }rtp_session_t;
 
-typedef struct rtp_packet
-{
-	void* ptr;
-	uint32_t ptr_len;
-	rtp_header_t hdr;
-	uint8_t arr[0];
-}rtp_packet_t;
-
 typedef struct {
 	uint16_t profile_specific; /* profile-specific info               */
 	uint16_t length;           /* number of 32-bit words in extension */
 } rtp_hdr_ext_t;
 
-#define RTP_DATA_OFF (sizeof(void*) + sizeof(uint32_t))//???
-
-#define RTP_BYTE(rtpp) &rtpp->hdr
-#define RTP_LEN(rtpp) (rtpp->ptr_len + sizeof(rtp_header_t))
+typedef struct rtp_packet
+{
+	rtp_hdr_t hdr;
+	rtp_hdr_ext_t hdr_ext;
+	void* ext_body;
+	uint16_t payload_len;
+	uint16_t ext_len;
+	uint8_t arr[0];
+}rtp_packet_t;
 
 //申请一个rtp包
-rtp_packet_t* alloc_rtp(int payload_size);
+rtp_packet_t* rtp_alloc(int payload_size);
+
+//添加扩展头
+void rtp_add_ext_hdr(rtp_packet_t*, uint16_t profile, uint16_t len, void* ext_body);
+//添加扩展头，内部分配扩展body
+void* rtp_alloc_ext_hdr(rtp_packet_t*, uint16_t profile, uint16_t len);
+
+int rtp_len(rtp_packet_t* rtp);
 
 //打包rtp包，已经进行字节序转换
-void pack_rtp(rtp_packet_t* rtp, rtp_parameter_t* param, rtp_session_t* session, const void* payload, int payload_len);
+void rtp_pack(rtp_packet_t* rtp, rtp_parameter_t* param, rtp_session_t* session, const void* payload, int payload_len);
 
 //复制一个rtp包
-int copy_rtp(rtp_packet_t* rtp, void* dest, int dest_len);
+int rtp_copy(rtp_packet_t* rtp, void* dest, int dest_len);
 
 //是否可能是一个rtp包
 int rtp_unpack_test(void* src, int len);
