@@ -35,6 +35,7 @@ int main_unpack_test()
 	rtp_packet_t* rtp_packet = rtp_alloc(sizeof(buff));
 	//fill rtp_packet
 	rtp_pack(rtp_packet, &param, &sess, buff, sizeof(buff));
+	rtp_alloc_ext_hdr(rtp_packet, 10, 3);
 	//
 	dump(rtp_packet, "original packet: ");
 

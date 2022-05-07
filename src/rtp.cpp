@@ -140,16 +140,14 @@ rtp_packet_t* rtp_unpack(void* src, int len)
 	}
 	memset(rtp, 0x0, payload_len + sizeof(rtp_packet_t));
 	rtp->payload_len = payload_len;
+	memcpy(&rtp->hdr, src, sizeof(rtp_hdr_t));
 	int pos = sizeof(rtp_hdr_t);
 	if (rtp->hdr.extbit == 1)
 	{
 		memcpy(&rtp->hdr, src, sizeof(rtp_hdr_ext_t) + sizeof(rtp_hdr_t));
 		pos = sizeof(rtp_hdr_ext_t) + sizeof(rtp_hdr_t);
 	}
-	else
-	{
-		memcpy(&rtp->hdr, src, sizeof(rtp_hdr_t));
-	}
+
 	if (rtp->hdr_ext.length > 0)
 	{
 		rtp->ext_body = p + pos;
@@ -170,10 +168,23 @@ void dump(rtp_packet_t* rtp, const char* text)
 	{
 		return;
 	}
-	printf("%s seq: %u, ssrc: %u, ts: %u, pt: %u, payload_len: %d\n", text,
-		rtp->hdr.seq_number,
-		rtp->hdr.ssrc,
-		rtp->hdr.timestamp,
-		rtp->hdr.paytype,
-		rtp->payload_len);
+	if (rtp->hdr.extbit == 0)
+	{
+		printf("%s seq: %u, ssrc: %u, ts: %u, pt: %u, payload_len: %d\n", text,
+			rtp->hdr.seq_number,
+			rtp->hdr.ssrc,
+			rtp->hdr.timestamp,
+			rtp->hdr.paytype,
+			rtp->payload_len);
+	}
+	else
+	{
+		printf("%s seq: %u, ssrc: %u, ts: %u, pt: %u, payload_len: %d, ext_hdr_len: %d\n", text,
+			rtp->hdr.seq_number,
+			rtp->hdr.ssrc,
+			rtp->hdr.timestamp,
+			rtp->hdr.paytype,
+			rtp->payload_len,
+			rtp->hdr_ext.length);
+	}
 }
