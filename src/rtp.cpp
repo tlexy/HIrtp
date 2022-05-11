@@ -110,6 +110,16 @@ int rtp_unpack_test(void* src, int len)
 	return 0;
 }
 
+int rtp_payload_type(void* src, int len)
+{
+	if (len <= sizeof(rtp_hdr_t))
+	{
+		return 0;
+	}
+	rtp_packet_t* tmp = (rtp_packet_t*)src;
+	return tmp->hdr.paytype;
+}
+
 rtp_packet_t* rtp_unpack(void* src, int len)
 {
 	if (len <= sizeof(rtp_hdr_t))

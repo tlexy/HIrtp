@@ -7,7 +7,7 @@
 
 //测试打包与发包
 
-int main1()
+int main_pack_test()
 {
 	char buff[128] = {};
 
@@ -34,8 +34,8 @@ int main1()
 	rtp_pack(rtp_packet, &param, &sess, buff, sizeof(buff));
 
 	//fill ext
-	void* ext_body = malloc(4);
-	memset(ext_body, 0x0, 4);
+	//void* ext_body = malloc(4);
+	//memset(ext_body, 0x0, 4);
 	//rtp_add_ext_hdr(rtp_packet, 10, 1, ext_body);
 	rtp_alloc_ext_hdr(rtp_packet, 10, 5);
 	//send
@@ -48,7 +48,7 @@ int main1()
 		int ret = rtp_copy(rtp_packet, pbuf, packet_len);
 		if (ret == 0)
 		{
-			sockets::SendUdp(sockfd, pbuf, packet_len, 0, "127.0.0.1", 6000);
+			sockets::SendUdp(sockfd, pbuf, packet_len, 0, "123.60.90.46", 6000);
 		}
 		sess.seq_number += 1;
 		sess.timestamp += 1024;

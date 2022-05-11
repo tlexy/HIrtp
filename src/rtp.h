@@ -77,6 +77,8 @@ int rtp_copy(rtp_packet_t* rtp, void* dest, int dest_len);
 //是否可能是一个rtp包
 int rtp_unpack_test(void* src, int len);
 
+int rtp_payload_type(void* src, int len);
+
 //将buffer转为rtp_packet
 rtp_packet_t* rtp_unpack(void* src, int len);
 

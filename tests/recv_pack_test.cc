@@ -15,7 +15,7 @@ int main()
 	int sockfd = sockets::Socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	sockaddr_in addr;
 	addr.sin_family = AF_INET;
-	addr.sin_port = htons(6000);
+	addr.sin_port = htons(3000);
 	addr.sin_addr.S_un.S_addr = INADDR_ANY;
 
 	//绑定套接字到一个本地地址
